@@ -1,0 +1,42 @@
+from ._anvil_designer import Form1Template
+from anvil import *
+import anvil.tables as tables
+import anvil.tables.query as q
+from anvil.tables import app_tables
+import anvil.server
+
+class Form1(Form1Template):
+
+  def __init__(self, **properties):
+    # Set Form properties and Data Bindings.
+    self.init_components(**properties)
+
+    # Any code you write here will run before the form opens.
+
+  def categorise_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    sepal_length = self.sepal_length_textbox.text
+    sepal_width = self.sepal_width_textbox.text
+    petal_length = self.petal_length_textbox.text
+    petal_width = self.petal_width_textbox.text
+
+    if sepal_length and sepal_width and petal_length and petal_width:
+     species = anvil.server.call('predict_iris',
+                               sepal_length,
+                               sepal_width,
+                               petal_length,
+                               petal_width)
+     if species:
+       self.species_label.visible = True 
+       self.species_label.text = 'The species is: ' + species.capitalize ()
+       self.iris_flower_image.visible = True 
+
+        
+       if species == 'virginica':
+         self.iris_flower_image.source= 'https://upload.wikimedia.org/wikipedia/commons/f/f8/Iris_virginica_2.jpg'
+       elif species == 'versicolor':
+         self.iris_flower_image.sourse = 'https://upload.wikimedia.org/wikipedia/commons/2/27/Blue_Flag%2C_Ottawa.jpg'
+       else:
+         self.iris_flower_image.source = 'https://upload.wikimedia.org/wikipedia/commons/a/a7/Irissetosa1.jpg'
+    else:
+      Notification(message='Please Enter All Measurements', timeout=2).show()
